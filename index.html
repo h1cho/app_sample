@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>연말정산 준비 도우미</title>
+<style>
+:root{
+  --bg:#F3F6FB; --card:#FFFFFF; --text:#183153; --primary:#2563EB;
+  --muted:#5B6B86; --line:#E2E8F2; --primary-soft:#E8F0FE;
+  --b1:#1E40AF; --b2:#2563EB; --b3:#60A5FA; --b4:#93C5FD; --b5:#BFDBFE; --b6:#DBEAFE;
+  --warn:#B42318; --warn-bg:#FEF0EE;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Pretendard","Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif;font-size:15px;line-height:1.5}
+.app{display:flex;min-height:100vh}
+.sidebar{width:230px;background:var(--card);border-right:1px solid var(--line);padding:24px 14px;position:sticky;top:0;height:100vh;flex-shrink:0}
+.brand{font-weight:700;font-size:17px;padding:0 10px 22px;line-height:1.3}
+.brand small{display:block;font-weight:400;color:var(--muted);font-size:12px;margin-top:2px}
+.nav button{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;color:var(--text);font:inherit;padding:11px 12px;border-radius:8px;cursor:pointer;text-align:left;margin-bottom:4px}
+.nav button:hover{background:var(--bg)}
+.nav button.active{background:var(--primary);color:#fff}
+.nav .ico{width:20px;text-align:center}
+.main{flex:1;padding:28px 32px;max-width:1100px;min-width:0}
+h1{font-size:22px;margin:0 0 4px}
+.sub{color:var(--muted);margin:0 0 22px}
+.card{background:var(--card);border-radius:12px;padding:20px;box-shadow:0 1px 3px rgba(24,49,83,.08);margin-bottom:18px}
+.card h2{font-size:16px;margin:0 0 14px}
+.grid{display:grid;gap:16px}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g2{grid-template-columns:1fr 1fr}
+.stat .label{color:var(--muted);font-size:13px}
+.stat .value{font-size:26px;font-weight:700;margin-top:4px}
+.stat .hint{color:var(--muted);font-size:12px;margin-top:2px}
+.progress{height:12px;background:var(--b6);border-radius:99px;overflow:hidden;margin-top:10px}
+.progress>div{height:100%;background:var(--primary);border-radius:99px;transition:width .3s}
+.bars .row{display:grid;grid-template-columns:110px 1fr 110px;gap:10px;align-items:center;margin-bottom:10px;font-size:14px}
+.bars .track{height:16px;background:var(--bg);border-radius:6px;overflow:hidden}
+.bars .fill{height:100%;border-radius:6px;transition:width .3s}
+.bars .amt{text-align:right;font-variant-numeric:tabular-nums}
+.legend{display:flex;flex-direction:column;gap:8px;font-size:14px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:8px;vertical-align:-1px}
+.donutwrap{display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+input,select,textarea{font:inherit;color:var(--text);border:1px solid #CBD5E6;border-radius:8px;padding:9px 10px;background:#fff;width:100%}
+input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--primary);outline-offset:1px}
+.form{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;align-items:end}
+.form .wide{grid-column:span 2}
+.btn{border:0;background:var(--primary);color:#fff;font:inherit;padding:10px 16px;border-radius:8px;cursor:pointer;font-weight:600}
+.btn:hover{background:#1D4ED8}
+.btn.ghost{background:var(--primary-soft);color:var(--primary)}
+.btn.ghost:hover{background:#D6E4FD}
+.btn.danger{background:var(--warn-bg);color:var(--warn)}
+.btn.sm{padding:5px 10px;font-size:13px}
+table{width:100%;border-collapse:collapse}
+th,td{padding:10px 8px;text-align:left;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font-size:12px;color:var(--muted);font-weight:600}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.actions{display:flex;gap:6px;justify-content:flex-end}
+.badge{display:inline-block;padding:2px 10px;border-radius:99px;font-size:12px;font-weight:600}
+.s0{background:#EEF1F6;color:#5B6B86}
+.s1{background:var(--b5);color:var(--b1)}
+.s2{background:var(--primary);color:#fff}
+.seg{display:inline-flex;border:1px solid #CBD5E6;border-radius:8px;overflow:hidden}
+.seg button{border:0;background:#fff;color:var(--text);font:inherit;font-size:13px;padding:6px 12px;cursor:pointer;border-right:1px solid #CBD5E6}
+.seg button:last-child{border-right:0}
+.seg button.on{background:var(--primary);color:#fff}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.chip{border:1px solid #CBD5E6;background:#fff;color:var(--text);padding:5px 14px;border-radius:99px;cursor:pointer;font:inherit;font-size:13px}
+.chip.on{background:var(--primary);border-color:var(--primary);color:#fff}
+.group-title{font-weight:700;margin:18px 0 4px;display:flex;justify-content:space-between}
+.group-title span{font-weight:400;color:var(--muted);font-size:13px}
+.empty{color:var(--muted);text-align:center;padding:28px 0}
+.todo{border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:12px}
+.todo-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
+.todo .fields{display:grid;grid-template-columns:1fr 160px;gap:10px}
+.todo .fields .full{grid-column:1/-1}
+.overdue{color:var(--warn);font-weight:600;font-size:12px;margin-left:6px}
+.note{background:var(--primary-soft);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--text);margin-bottom:18px}
+.tags{display:flex;flex-wrap:wrap;gap:8px}
+.tag{display:inline-flex;align-items:center;gap:6px;background:var(--primary-soft);color:var(--b1);padding:5px 6px 5px 12px;border-radius:99px;font-size:14px}
+.tag button{border:0;background:none;cursor:pointer;color:var(--b1);font-size:16px;line-height:1;padding:0 6px}
+.inline{display:flex;gap:10px}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--text);color:#fff;padding:10px 18px;border-radius:8px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.show{opacity:1}
+@media (max-width:860px){
+  .app{flex-direction:column}
+  .sidebar{width:100%;height:auto;position:static;padding:12px;border-right:0;border-bottom:1px solid var(--line)}
+  .brand{padding-bottom:10px}
+  .nav{display:flex;gap:6px;overflow-x:auto}
+  .nav button{width:auto;white-space:nowrap;margin:0}
+  .main{padding:20px 16px}
+  .g3,.g2{grid-template-columns:1fr}
+  .form{grid-template-columns:1fr 1fr}
+  .bars .row{grid-template-columns:80px 1fr 90px}
+  .todo .fields{grid-template-columns:1fr}
+  .tablewrap{overflow-x:auto}
+  table{min-width:560px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">연말정산 준비 도우미<small>금액·증빙 준비 관리</small></div>
+    <nav class="nav" id="nav"></nav>
+  </aside>
+  <main class="main" id="main"></main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+var KEY='yearend-helper-v1';
+var DEFAULT_CATS=['의료비','교육비','기부금','신용카드 등 사용액','보험료','주택자금','연금저축·IRP'];
+var STATUS=['미준비','준비 중','완료'];
+var SHADES=['#1E40AF','#2563EB','#3B82F6','#60A5FA','#93C5FD','#BFDBFE','#DBEAFE'];
+var MENUS=[
+  {id:'dash',label:'대시보드',ico:'▦'},
+  {id:'input',label:'금액 입력',ico:'✎'},
+  {id:'check',label:'증빙 체크리스트',ico:'☑'},
+  {id:'todo',label:'미비 항목·메모',ico:'⚑'},
+  {id:'set',label:'설정',ico:'⚙'}
+];
+var SAMPLE=[
+  ['의료비','병원 진료비',420000,2,'병원','',''],
+  ['의료비','안경 구입비',150000,1,'안경점','',''],
+  ['교육비','자녀 학원비',1800000,0,'학원','',''],
+  ['기부금','종교단체 기부',300000,1,'기부 단체','',''],
+  ['신용카드 등 사용액','신용카드 사용액',9500000,2,'카드사 홈택스','',''],
+  ['보험료','보장성 보험료',720000,0,'보험사','',''],
+  ['연금저축·IRP','연금저축 납입액',4000000,1,'금융회사','','']
+];
+
+var state=load();
+var view='dash';
+var editingId=null;
+var filter='전체';
+var todoOpen={};
+
+function uid(){return 'i'+Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function load(){
+  try{
+    var raw=localStorage.getItem(KEY);
+    if(raw){var s=JSON.parse(raw); if(s&&Array.isArray(s.items)&&Array.isArray(s.cats)) return s;}
+  }catch(e){}
+  return {cats:DEFAULT_CATS.slice(),items:[]};
+}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function won(n){return Number(n||0).toLocaleString('ko-KR')+'원'}
+function today(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(function(){t.classList.remove('show')},1800)}
+function find(id){return state.items.filter(function(i){return i.id===id})[0]}
+
+/* 집계 */
+function stats(){
+  var total=0,done=0,doing=0,none=0;
+  var byCat={};
+  state.cats.forEach(function(c){byCat[c]=0});
+  state.items.forEach(function(i){
+    total+=i.amount;
+    byCat[i.cat]=(byCat[i.cat]||0)+i.amount;
+    if(i.status===2)done++;else if(i.status===1)doing++;else none++;
+  });
+  var n=state.items.length;
+  return {total:total,n:n,done:done,doing:doing,none:none,rate:n?Math.round(done/n*100):0,byCat:byCat};
+}
+
+/* 렌더 */
+function renderNav(){
+  document.getElementById('nav').innerHTML=MENUS.map(function(m){
+    return '<button data-nav="'+m.id+'" class="'+(m.id===view?'active':'')+'"'+(m.id===view?' aria-current="page"':'')+'><span class="ico">'+m.ico+'</span>'+m.label+'</button>';
+  }).join('');
+}
+function header(t,s){return '<h1>'+t+'</h1><p class="sub">'+s+'</p>'}
+function badge(s){return '<span class="badge s'+s+'">'+STATUS[s]+'</span>'}
+
+function viewDash(){
+  var st=stats();
+  var h=header('대시보드','입력한 금액 합계와 증빙 준비율을 한눈에 확인해요.');
+  h+='<div class="note">이 사이트는 금액 합계와 준비율만 보여줘요. 실제 세금이나 환급액은 계산하지 않아요.</div>';
+  h+='<div class="grid g3">'+
+    '<div class="card stat"><div class="label">입력 금액 합계</div><div class="value">'+won(st.total)+'</div><div class="hint">항목 '+st.n+'건</div></div>'+
+    '<div class="card stat"><div class="label">증빙 준비율</div><div class="value">'+st.rate+'%</div><div class="progress"><div style="width:'+st.rate+'%"></div></div></div>'+
+    '<div class="card stat"><div class="label">완료 / 전체</div><div class="value">'+st.done+' / '+st.n+'</div><div class="hint">남은 항목 '+(st.n-st.done)+'건</div></div>'+
+  '</div>';
+  h+='<div class="grid g2">';
+  // 카테고리별 막대
+  var cats=state.cats.filter(function(c){return st.byCat[c]>0});
+  var max=Math.max.apply(null,cats.map(function(c){return st.byCat[c]}).concat([1]));
+  h+='<div class="card"><h2>공제 항목별 금액</h2><div class="bars">';
+  if(!cats.length)h+='<div class="empty">입력된 금액이 없어요.</div>';
+  cats.forEach(function(c,i){
+    h+='<div class="row"><span>'+esc(c)+'</span><div class="track"><div class="fill" style="width:'+(st.byCat[c]/max*100)+'%;background:'+SHADES[Math.min(i,SHADES.length-1)]+'"></div></div><span class="amt">'+won(st.byCat[c])+'</span></div>';
+  });
+  h+='</div></div>';
+  // 도넛
+  var parts=[[st.done,'완료',SHADES[0]],[st.doing,'준비 중',SHADES[3]],[st.none,'미준비',SHADES[5]]];
+  var r=52,c=2*Math.PI*r,off=0,svg='<svg width="140" height="140" viewBox="0 0 140 140" role="img" aria-label="증빙 상태 비율"><circle cx="70" cy="70" r="'+r+'" fill="none" stroke="#EEF1F6" stroke-width="22"/>';
+  if(st.n){
+    parts.forEach(function(p){
+      if(!p[0])return;
+      var len=p[0]/st.n*c;
+      svg+='<circle cx="70" cy="70" r="'+r+'" fill="none" stroke="'+p[2]+'" stroke-width="22" stroke-dasharray="'+len+' '+(c-len)+'" stroke-dashoffset="'+(-off)+'" transform="rotate(-90 70 70)"/>';
+      off+=len;
+    });
+  }
+  svg+='<text x="70" y="76" text-anchor="middle" font-size="22" font-weight="700" fill="#183153">'+st.rate+'%</text></svg>';
+  h+='<div class="card"><h2>증빙 준비 상태</h2><div class="donutwrap">'+svg+'<div class="legend">'+
+    parts.map(function(p){return '<div><i style="background:'+p[2]+'"></i>'+p[1]+' '+p[0]+'건</div>'}).join('')+'</div></div></div>';
+  h+='</div>';
+  return h;
+}
+
+function viewInput(){
+  var e=editingId?find(editingId):null;
+  var h=header('금액 입력','공제 항목별 금액을 추가하고 수정·삭제해요.');
+  h+='<div class="card"><h2>'+(e?'항목 수정':'새 항목 추가')+'</h2>'+
+  '<form id="itemForm" class="form" autocomplete="off">'+
+    '<div><label for="fCat">공제 항목</label><select id="fCat">'+state.cats.map(function(c){return '<option'+(e&&e.cat===c?' selected':'')+'>'+esc(c)+'</option>'}).join('')+'</select></div>'+
+    '<div class="wide"><label for="fName">내용</label><input id="fName" required maxlength="40" placeholder="예: 병원 진료비" value="'+esc(e?e.name:'')+'"></div>'+
+    '<div><label for="fAmt">금액(원)</label><input id="fAmt" type="number" min="0" step="1" required placeholder="0" value="'+(e?e.amount:'')+'"></div>'+
+    '<div><label for="fStatus">증빙 상태</label><select id="fStatus">'+STATUS.map(function(s,i){return '<option value="'+i+'"'+(e&&e.status===i?' selected':'')+'>'+s+'</option>'}).join('')+'</select></div>'+
+    '<div class="inline" style="grid-column:span 3"><button class="btn" type="submit">'+(e?'수정 저장':'추가')+'</button>'+(e?'<button class="btn ghost" type="button" data-act="cancel">취소</button>':'')+'</div>'+
+  '</form></div>';
+  h+='<div class="card"><h2>입력 목록 <span style="font-weight:400;color:var(--muted);font-size:13px">합계 '+won(stats().total)+'</span></h2>';
+  if(!state.items.length){
+    h+='<div class="empty">아직 입력한 항목이 없어요.<br><button class="btn ghost" style="margin-top:12px" data-act="sample">예시 데이터 넣기</button></div>';
+  }else{
+    h+='<div class="tablewrap"><table><thead><tr><th>공제 항목</th><th>내용</th><th class="num">금액</th><th>증빙</th><th></th></tr></thead><tbody>'+
+    state.items.map(function(i){
+      return '<tr><td>'+esc(i.cat)+'</td><td>'+esc(i.name)+'</td><td class="num">'+won(i.amount)+'</td><td>'+badge(i.status)+'</td>'+
+      '<td><div class="actions"><button class="btn ghost sm" data-act="edit" data-id="'+i.id+'">수정</button><button class="btn danger sm" data-act="del" data-id="'+i.id+'">삭제</button></div></td></tr>';
+    }).join('')+'</tbody></table></div>';
+  }
+  return h+'</div>';
+}
+
+function segHtml(i){
+  return '<div class="seg" role="group" aria-label="증빙 상태">'+STATUS.map(function(s,k){
+    return '<button type="button" class="'+(i.status===k?'on':'')+'" data-act="status" data-id="'+i.id+'" data-s="'+k+'">'+s+'</button>';
+  }).join('')+'</div>';
+}
+function viewCheck(){
+  var h=header('증빙 체크리스트','항목별 증빙 서류의 준비 상태를 바꾸면 준비율에 바로 반영돼요.');
+  var st=stats();
+  h+='<div class="card"><div style="display:flex;justify-content:space-between"><b>준비율 '+st.rate+'%</b><span style="color:var(--muted)">'+st.done+' / '+st.n+'건 완료</span></div><div class="progress"><div style="width:'+st.rate+'%"></div></div></div>';
+  h+='<div class="chips">'+['전체'].concat(STATUS).map(function(f){return '<button class="chip'+(f===filter?' on':'')+'" data-act="filter" data-f="'+f+'">'+f+'</button>'}).join('')+'</div>';
+  var any=false;
+  state.cats.forEach(function(c){
+    var list=state.items.filter(function(i){return i.cat===c&&(filter==='전체'||STATUS[i.status]===filter)});
+    if(!list.length)return;
+    any=true;
+    var d=state.items.filter(function(i){return i.cat===c&&i.status===2}).length,t=state.items.filter(function(i){return i.cat===c}).length;
+    h+='<div class="card"><div class="group-title" style="margin-top:0">'+esc(c)+'<span>'+d+' / '+t+' 완료</span></div><div class="tablewrap"><table><tbody>'+
+    list.map(function(i){return '<tr><td>'+esc(i.name)+'</td><td class="num">'+won(i.amount)+'</td><td style="text-align:right">'+segHtml(i)+'</td></tr>'}).join('')+'</tbody></table></div></div>';
+  });
+  if(!any)h+='<div class="card"><div class="empty">'+(state.items.length?'해당 상태의 항목이 없어요.':'금액 입력 메뉴에서 항목을 먼저 추가해 주세요.')+'</div></div>';
+  return h;
+}
+
+function viewTodo(){
+  var list=state.items.filter(function(i){return i.status!==2});
+  var h=header('미비 항목·메모','아직 준비되지 않은 항목을 모아 보고, 발급처와 마감일, 메모를 남겨요.');
+  if(!list.length){
+    return h+'<div class="card"><div class="empty">'+(state.items.length?'모든 증빙이 준비됐어요. 🎉':'금액 입력 메뉴에서 항목을 먼저 추가해 주세요.')+'</div></div>';
+  }
+  list.sort(function(a,b){return (a.due||'9999')<(b.due||'9999')?-1:1});
+  var td=today();
+  h+='<p class="sub" style="margin-top:-10px">남은 항목 '+list.length+'건 · 마감일이 빠른 순이에요.</p>';
+  list.forEach(function(i){
+    var over=i.due&&i.due<td;
+    h+='<div class="todo"><div class="todo-head"><div><b>'+esc(i.name)+'</b> <span style="color:var(--muted)">· '+esc(i.cat)+' · '+won(i.amount)+'</span>'+(over?'<span class="overdue">마감 지남</span>':'')+'</div>'+
+    '<div class="inline">'+segHtml(i)+'</div></div>'+
+    '<div class="fields"><div><label>발급처</label><input data-field="issuer" data-id="'+i.id+'" maxlength="40" placeholder="예: 홈택스, 병원" value="'+esc(i.issuer)+'"></div>'+
+    '<div><label>마감일</label><input type="date" data-field="due" data-id="'+i.id+'" value="'+esc(i.due)+'"></div>'+
+    '<div class="full"><label>메모</label><textarea rows="2" data-field="memo" data-id="'+i.id+'" maxlength="300" placeholder="메모를 남겨 보세요">'+esc(i.memo)+'</textarea></div></div></div>';
+  });
+  return h;
+}
+
+function viewSet(){
+  var h=header('설정','공제 항목을 관리하고 데이터를 초기화해요.');
+  h+='<div class="card"><h2>공제 항목 관리</h2><div class="tags" style="margin-bottom:16px">'+
+  state.cats.map(function(c){return '<span class="tag">'+esc(c)+'<button data-act="delcat" data-c="'+esc(c)+'" aria-label="'+esc(c)+' 삭제">×</button></span>'}).join('')+'</div>'+
+  '<form id="catForm" class="inline" autocomplete="off"><input id="newCat" maxlength="20" placeholder="새 공제 항목 이름" style="max-width:280px" required><button class="btn" type="submit">추가</button></form></div>';
+  h+='<div class="card"><h2>데이터</h2><p style="color:var(--muted);margin-top:0">입력한 내용은 이 브라우저에만 저장돼요.</p><div class="inline">'+
+  '<button class="btn ghost" data-act="sample">예시 데이터 추가</button><button class="btn danger" data-act="reset">모든 데이터 초기화</button></div></div>';
+  return h;
+}
+
+function render(){
+  renderNav();
+  var el=document.getElementById('main');
+  var fn={dash:viewDash,input:viewInput,check:viewCheck,todo:viewTodo,set:viewSet}[view];
+  var scroll=window.scrollY;
+  el.innerHTML=fn();
+  window.scrollTo(0,scroll);
+}
+
+/* 이벤트 */
+document.addEventListener('click',function(ev){
+  var n=ev.target.closest('[data-nav]');
+  if(n){view=n.dataset.nav;editingId=null;render();window.scrollTo(0,0);return}
+  var b=ev.target.closest('[data-act]');
+  if(!b)return;
+  var act=b.dataset.act,id=b.dataset.id;
+  if(act==='edit'){editingId=id;render();window.scrollTo(0,0)}
+  else if(act==='cancel'){editingId=null;render()}
+  else if(act==='del'){
+    var it=find(id);
+    if(it&&confirm('"'+it.name+'" 항목을 삭제할까요?')){state.items=state.items.filter(function(i){return i.id!==id});if(editingId===id)editingId=null;save();render();toast('삭제했어요.')}
+  }
+  else if(act==='status'){var x=find(id);if(x){x.status=Number(b.dataset.s);save();render()}}
+  else if(act==='filter'){filter=b.dataset.f;render()}
+  else if(act==='sample'){
+    SAMPLE.forEach(function(s){if(state.cats.indexOf(s[0])<0)state.cats.push(s[0]);state.items.push({id:uid(),cat:s[0],name:s[1],amount:s[2],status:s[3],issuer:s[4],due:s[5],memo:s[6]})});
+    save();render();toast('예시 데이터를 추가했어요.');
+  }
+  else if(act==='reset'){
+    if(confirm('입력한 모든 항목과 설정을 삭제하고 처음 상태로 되돌릴까요? 되돌릴 수 없어요.')){state={cats:DEFAULT_CATS.slice(),items:[]};editingId=null;save();render();toast('초기화했어요.')}
+  }
+  else if(act==='delcat'){
+    var c=b.dataset.c;
+    if(state.items.some(function(i){return i.cat===c})){toast('이 항목을 쓰는 입력이 있어 삭제할 수 없어요.');return}
+    if(state.cats.length<=1){toast('공제 항목은 최소 1개가 필요해요.');return}
+    state.cats=state.cats.filter(function(x){return x!==c});save();render();
+  }
+});
+document.addEventListener('submit',function(ev){
+  ev.preventDefault();
+  if(ev.target.id==='itemForm'){
+    var amt=Math.round(Number(document.getElementById('fAmt').value));
+    var name=document.getElementById('fName').value.trim();
+    if(!name||!isFinite(amt)||amt<0){toast('내용과 0 이상의 금액을 입력해 주세요.');return}
+    var data={cat:document.getElementById('fCat').value,name:name,amount:amt,status:Number(document.getElementById('fStatus').value)};
+    if(editingId){var x=find(editingId);if(x)Object.assign(x,data);editingId=null;toast('수정했어요.')}
+    else{state.items.push(Object.assign({id:uid(),issuer:'',due:'',memo:''},data));toast('추가했어요.')}
+    save();render();
+  }else if(ev.target.id==='catForm'){
+    var v=document.getElementById('newCat').value.trim();
+    if(!v)return;
+    if(state.cats.indexOf(v)>=0){toast('이미 있는 항목이에요.');return}
+    state.cats.push(v);save();render();
+  }
+});
+document.addEventListener('change',function(ev){
+  var f=ev.target.dataset&&ev.target.dataset.field;
+  if(!f)return;
+  var x=find(ev.target.dataset.id);
+  if(x){x[f]=ev.target.value;save();if(f==='due')render();else toast('저장했어요.')}
+});
+
+render();
+})();
+</script>
+</body>
+</html>
